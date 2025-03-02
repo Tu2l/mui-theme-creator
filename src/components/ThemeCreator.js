@@ -1,36 +1,16 @@
 "use client"
-
 import { useState } from "react"
 import {
   Box,
   Typography,
   Paper,
   Button,
-  TextField,
-  Select,
-  MenuItem,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  InputLabel,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemButton,
-  Collapse,
-  Modal,
-  Divider
+  Divider,
 } from "@mui/material"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import ColorPicker from "./ColorPicker"
 import ComponentCustomizer from "./ComponentCustomizer"
-import ErrorIcon from "@mui/icons-material/Error"
+import { NewThemeModal, ThemePanel } from "./theme-panel"
+import { ComponentPanel } from "./component-panel"
 
 const initialTheme = {
   name: "",
@@ -116,7 +96,6 @@ const initialTheme = {
   components: {},
 }
 
-
 export default function ThemeCreator() {
   const [themes, setThemes] = useState([])
   const [themeType, setThemeType] = useState("light")
@@ -125,6 +104,10 @@ export default function ThemeCreator() {
   const [newThemeName, setNewThemeName] = useState("")
   const [oldThemeName, setOldThemeName] = useState("")
   const [newThemeNameConflict, setNewThemeNameConflict] = useState(false)
+  const [activeStep, setActiveStep] = useState(2)
+  const [expandedComponent, setExpandedComponent] = useState(null)
+  const [openNewThemeModal, setOpenNewThemeModal] = useState(false)
+
 
   const handleColorChange = (colorType, colorKey, color) => {
     setCurrentTheme((prevTheme) => ({
@@ -146,6 +129,7 @@ export default function ThemeCreator() {
     )
   }
 
+  // TODO - fix - update the array properly
   const handleComponentCustomization = (componentName, variantName, styles) => {
     setCurrentTheme((prevTheme) => ({
       ...prevTheme,
@@ -165,25 +149,27 @@ export default function ThemeCreator() {
     }))
 
     // Update the selected theme in the themes array
+    console.log(selectedThemeIndex)
     setThemes((prevThemes) =>
       prevThemes.map((theme, index) =>
         index === selectedThemeIndex ? currentTheme : theme
       )
     )
-  }
 
-  const handleThemeNameUpdate = (event) => {
-    setCurrentTheme({ ...currentTheme, name: event.target.value })
+    console.log(currentTheme)
+    console.log(themes)
+
   }
 
   const handleDeleteTheme = (index) => {
-    setThemes((prevThemes) => prevThemes.filter((theme, i) => i !== index))
-    if (index < selectedThemeIndex) {
-      setSelectedThemeIndex(selectedThemeIndex - 1)
-    }
-
-    if (selectedThemeIndex > -1) {
-      setCurrentTheme(themes[selectedThemeIndex])
+    if (window.confirm("Are you sure you want to delete this theme?")) {
+      setThemes((prevThemes) => prevThemes.filter((theme, i) => i !== index))
+      if (index < selectedThemeIndex) {
+        setSelectedThemeIndex(selectedThemeIndex - 1)
+      } else if (index === selectedThemeIndex) {
+        setSelectedThemeIndex(-1)
+        setCurrentTheme(initialTheme)
+      }
     }
   }
 
@@ -229,10 +215,6 @@ export default function ThemeCreator() {
     setNewThemeName("")
   }
 
-  const handleSaveTheme = () => {
-    setThemes((prevThemes) => prevThemes.map((theme, index) => (index === selectedThemeIndex ? currentTheme : theme)))
-  }
-
   const handleNewThemeNameChange = (event) => {
     if (themes.some((theme) => theme.name === event.target.value)) {
       setNewThemeNameConflict(true)
@@ -247,6 +229,7 @@ export default function ThemeCreator() {
   }
 
   const generateThemeJson = () => {
+    console.log(themes)
     const jsonString = JSON.stringify(themes, null, 2)
     const blob = new Blob([jsonString], { type: "application/json" })
     const url = URL.createObjectURL(blob)
@@ -256,8 +239,6 @@ export default function ThemeCreator() {
     a.click()
     URL.revokeObjectURL(url)
   }
-
-  const [activeStep, setActiveStep] = useState(2)
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -452,13 +433,9 @@ export default function ThemeCreator() {
     }
   }
 
-  const [expandedComponent, setExpandedComponent] = useState(null)
-
   const handleComponentClick = (componentName) => {
     setExpandedComponent((prev) => (prev === componentName ? null : componentName))
   }
-
-  const [openNewThemeModal, setOpenNewThemeModal] = useState(false)
 
   const handleOpenNewThemeModal = () => {
     setOpenNewThemeModal(true)
@@ -471,194 +448,30 @@ export default function ThemeCreator() {
     setThemeType("light")
   }
 
-
-  const themePanel = (
-    <TableContainer>
-      <Table>
-        <TableBody>
-          <TableRow sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
-            <TableCell>
-              <Typography variant="h6" gutterBottom>
-                All Themes
-              </Typography>
-            </TableCell>
-            <TableCell align="right">
-              <Button variant="outlined" onClick={handleOpenNewThemeModal}>
-                + Add
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
-
-  const themeList = (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }} align="center">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {themes.map((theme, index) => (
-            <TableRow
-              key={index}
-            >
-              <TableCell
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  minHeight: '65px',
-                  borderLeft: selectedThemeIndex === index ? '4px solid #2196f3' : 'none',
-                  ...getThemeSelectedStyle(index),
-                }}
-                onClick={() => handleSelectTheme(index)}
-              >
-                {theme.name}
-              </TableCell>
-              <TableCell
-                sx={getThemeSelectedStyle(index)}
-                onClick={() => handleSelectTheme(index)}
-              >
-                {theme.palette.mode}
-              </TableCell>
-              <TableCell align="right">
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={
-                    () => {
-                      setOldThemeName(themes[index].name)
-                      setNewThemeName(themes[index].name)
-                      setThemeType(themes[index].palette.mode)
-                      setOpenNewThemeModal(true)
-                    }
-                  }
-                  sx={{ marginRight: 1 }}
-                >
-                  Edit
-                </Button>
-
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  disabled={selectedThemeIndex === index}
-                  onClick={() => handleDeleteTheme(index)}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
-
-
   return (
     <Box sx={{ flexGrow: 1, padding: 3 }}>
-      <Modal
-        open={openNewThemeModal}
-        onClose={handleCloseNewThemeModal}
-        aria-labelledby="new-theme-modal-title"
-        aria-describedby="new-theme-modal-description"
-      >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          border: '1px solid #cacaca',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2
-        }}>
-          <Typography id="new-theme-modal-title" variant="h6" component="h2">
-            {(!oldThemeName || oldThemeName.trim() === "") ? 'Add New Theme' : 'Edit Theme'}
-          </Typography>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="theme-name"
-            label="Theme Name"
-            type="text"
-            fullWidth
-            inputProps={{ maxLength: 10 }}
-            value={newThemeName}
-            onChange={handleNewThemeNameChange}
-            error={newThemeNameConflict}
-          />
-          {newThemeNameConflict &&
-            <Typography
-              variant="p"
-              sx={{
-                color: 'red',
-                display: 'flex',
-                alignItems: 'center',
-                border: '1px solid red',
-                marginBottom: 2,
-                padding: 1,
-                borderRadius: 1
-              }} gutterBottom>
-              <ErrorIcon sx={{ marginRight: 1 }} /> Theme with this name already exists
-            </Typography>}
-          <InputLabel id="theme-type-label">Theme Type</InputLabel>
-          <Select
-            labelId="theme-type-label"
-            id="theme-type"
-            value={themeType}
-            label="Theme Type"
-            onChange={(e) => setThemeType(e.target.value)}
-            fullWidth
-            margin="dense"
-          >
-            <MenuItem value={"light"}>Light</MenuItem>
-            <MenuItem value={"dark"}>Dark</MenuItem>
-          </Select>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={handleCloseNewThemeModal} sx={{ mr: 1 }}>Cancel</Button>
-            <Button
-              onClick={() => {
-                if (!oldThemeName || oldThemeName.trim() === "") {
-                  handleAddTheme()
-                } else {
-                  handleThemeUpdate(oldThemeName, newThemeName, themeType)
-                  console.log(themes)
-                }
-                handleCloseNewThemeModal()
-              }}
-              variant="contained"
-              disabled={shouldDisableAddButton()}
-            >
-              {(!oldThemeName || oldThemeName.trim() === "") ? 'Add Theme' : 'Update Theme'}
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Typography
-        variant="h4"
-        fontWeight={700}
-        gutterBottom align="left"
-        sx={{ textDecoration: 'underline' }}
-      >
-        MUI Theme Creator
-      </Typography>
+      <NewThemeModal
+        openNewThemeModal={openNewThemeModal}
+        handleCloseNewThemeModal={handleCloseNewThemeModal}
+        newThemeName={newThemeName}
+        handleNewThemeNameChange={handleNewThemeNameChange}
+        newThemeNameConflict={newThemeNameConflict}
+        themeType={themeType}
+        setThemeType={setThemeType}
+        handleAddTheme={handleAddTheme}
+        handleThemeUpdate={handleThemeUpdate}
+        shouldDisableAddButton={shouldDisableAddButton}
+        oldThemeName={oldThemeName}
+        themes={themes} />
 
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          mb: 2
+          mb: 2,
+          border: '1px solid #2196f3',
+          borderRadius: 1,
+          padding: 1,
         }}>
 
         <Button
@@ -690,122 +503,36 @@ export default function ThemeCreator() {
           </Button>}
       </Box>
 
-      <Box sx={{
-        display: 'grid',
-        minHeight: 800,
-        gridTemplateColumns: {
-          xs: '1fr',
-          md: '1fr 2fr 0.6fr',
-        },
-        gap: 3,
-      }}>
-        <Paper elevation={3} sx={{ padding: 2 }}>
-          {themePanel}
+      <Box
+        sx={{
+          display: 'grid',
+          minHeight: 800,
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: '1fr 2fr 0.6fr',
+          },
+          gap: 3,
+        }}>
 
-          {themes.length > 0 ? (
-            themeList
-          ) : (
-            <Typography>No themes added yet.</Typography>
-          )}
-        </Paper>
+        <ThemePanel
+          themes={themes}
+          selectedThemeIndex={selectedThemeIndex}
+          handleSelectTheme={handleSelectTheme}
+          handleDeleteTheme={handleDeleteTheme}
+          setOldThemeName={setOldThemeName}
+          setNewThemeName={setNewThemeName}
+          setThemeType={setThemeType}
+          setOpenNewThemeModal={setOpenNewThemeModal}
+          handleOpenNewThemeModal={handleOpenNewThemeModal} />
 
         {getStepContent(activeStep)}
 
-        <Paper elevation={3} sx={{ padding: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Components
-          </Typography>
-          {currentTheme.components && Object.keys(currentTheme.components).length > 0 ? (
-            <List>
-              {Object.keys(currentTheme.components).map((componentName) => (
-                <Box key={componentName}>
-                  <ListItemButton onClick={() => handleComponentClick(componentName)}>
-                    <ListItemText primary={componentName} />
-                  </ListItemButton>
-                  <Collapse in={expandedComponent === componentName} timeout="auto" unmountOnExit>
-                    <List component="div">
-                      {currentTheme.components[componentName].variants && currentTheme.components[componentName].variants.length > 0 ? (
-                        currentTheme.components[componentName].variants.map((variant, index) => (
-                          <ListItem key={index} sx={{ pl: 4 }}>
-                            <ListItemText
-                              primary={`Variant: ${variant.props.variant}`}
-                              secondary={`Styles: ${JSON.stringify(variant.style)}`}
-                            />
-                          </ListItem>
-                        ))
-                      ) : (
-                        <ListItem sx={{ pl: 4 }}>
-                          <ListItemText primary="No variants defined for this component." />
-                        </ListItem>
-                      )}
-                    </List>
-                  </Collapse>
-                </Box>
-              ))}
-            </List>
-          ) : (
-            <Typography>No components customized yet.</Typography>
-          )}
-        </Paper>
+        <ComponentPanel
+          currentTheme={currentTheme}
+          expandedComponent={expandedComponent}
+          handleComponentClick={handleComponentClick}
+        />
       </Box>
     </Box>
   )
-
-
-  function getThemeSelectedStyle(index) {
-    return {
-      fontWeight: selectedThemeIndex === index ? 'bold' : 'normal',
-      '&:hover': {
-        backgroundColor: 'rgba(0, 0, 0, 0.04)',
-        cursor: 'pointer',
-      },
-      ...(selectedThemeIndex === index && {
-        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-      }),
-    }
-  }
-
-  function ThemeSelection() {
-    return (
-      <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Theme Selection
-        </Typography>
-        <Select
-          value={selectedThemeIndex}
-          onChange={(e) => handleSelectTheme(e.target.value)}
-          fullWidth
-          sx={{ marginBottom: 2 }}
-        >
-          {themes.map((theme, index) => (
-            <MenuItem key={index} value={index}>
-              {theme.name}
-            </MenuItem>
-          ))}
-        </Select>
-        <TextField
-          label="Theme Name"
-          value={currentTheme.name}
-          onChange={handleThemeNameUpdate}
-          fullWidth
-          sx={{ marginBottom: 2 }} />
-        <Button onClick={handleSaveTheme} variant="contained" sx={{ marginRight: 1 }}>
-          Update Theme Name
-        </Button>
-        <Button
-          onClick={() => setCurrentTheme(
-            {
-              ...initialTheme,
-              name: currentTheme.name,
-              palette: {
-                ...initialTheme.palette,
-                mode: currentTheme.palette.mode
-              }
-            })}
-          variant="outlined">
-          Reset Theme Attributes
-        </Button>
-      </Paper>
-    )
-  }
 }

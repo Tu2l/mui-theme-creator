@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { TextField, Button, Typography, Paper, Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { TextField, Button, Paper } from "@mui/material"
 
 export default function ComponentCustomizer({ onCustomize }) {
   const [componentName, setComponentName] = useState("")
@@ -22,7 +21,7 @@ export default function ComponentCustomizer({ onCustomize }) {
   }
 
   return (
-    <Paper elevation={3} sx={{ padding: 3, marginBottom: 3}}>
+    <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
       <TextField
         label="Component Name"
         value={componentName}
