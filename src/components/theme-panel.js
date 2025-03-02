@@ -16,7 +16,7 @@ import {
     Typography,
     InputLabel
 } from "@mui/material";
-import { Delete as DeleteIcon, Edit as EditIcon, Error as ErrorIcon } from "@mui/icons-material"
+import { Delete as DeleteIcon, Edit as EditIcon, Error as ErrorIcon, Height } from "@mui/icons-material"
 
 
 export function ThemePanel(props) {
@@ -89,13 +89,13 @@ export function ThemePanelContent(props) {
     const getThemeSelectedStyle = (index) => {
         return {
             fontWeight: selectedThemeIndex === index ? 'bold' : 'normal',
+            p: 1,
             '&:hover': {
                 cursor: 'pointer',
             },
             ...(selectedThemeIndex === index && {
                 backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                borderTop: '2px solid #2196f3',
-                borderBottom: '2px solid #2196f3',
+                border: '2px solid #2196f3',
             }),
         }
     }
@@ -114,18 +114,17 @@ export function ThemePanelContent(props) {
                     {themes.map((theme, index) => (
                         <TableRow
                             key={index}
+                            sx={{
+                                borderLeft: selectedThemeIndex === index ? '2px solid #2196f3' : 'none',
+                                ...getThemeSelectedStyle(index),
+                            }}
                         >
                             <TableCell
-                                sx={{
-                                    borderLeft: selectedThemeIndex === index ? '2px solid #2196f3' : 'none',
-                                    ...getThemeSelectedStyle(index),
-                                }}
                                 onClick={() => handleSelectTheme(index)}
                             >
                                 {theme.name}
                             </TableCell>
                             <TableCell
-                                sx={getThemeSelectedStyle(index)}
                                 onClick={() => handleSelectTheme(index)}
                             >
                                 {theme.palette.mode}
@@ -149,7 +148,7 @@ export function ThemePanelContent(props) {
 
                                 <IconButton
                                     size="small"
-                                    color="error"
+                                    color="warning"
                                     disabled={selectedThemeIndex === index}
                                     onClick={() => handleDeleteTheme(index)}
                                 >

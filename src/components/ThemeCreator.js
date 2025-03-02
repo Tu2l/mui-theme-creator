@@ -3,14 +3,13 @@ import { useState } from "react"
 import {
   Box,
   Typography,
-  Paper,
   Button,
-  Divider,
 } from "@mui/material"
-import ColorPicker from "./ColorPicker"
 import ComponentCustomizer from "./ComponentCustomizer"
 import { NewThemeModal, ThemePanel } from "./theme-panel"
 import { ComponentPanel } from "./component-panel"
+import ColorCustomizer from "./ColorCustomizer"
+import ControlPanel from "./ControlPanel"
 
 const initialTheme = {
   name: "",
@@ -131,33 +130,43 @@ export default function ThemeCreator() {
 
   // TODO - fix - update the array properly
   const handleComponentCustomization = (componentName, variantName, styles) => {
-    setCurrentTheme((prevTheme) => ({
-      ...prevTheme,
-      components: {
-        ...prevTheme.components,
-        [componentName]: {
-          ...prevTheme.components[componentName],
-          variants: [
-            ...(prevTheme.components[componentName]?.variants || []),
-            {
-              props: { variant: variantName },
-              style: styles,
-            },
-          ],
-        },
-      },
-    }))
+    setCurrentTheme((prevTheme) => {
+      const updatedComponents = { ...prevTheme.components }
+      if (!updatedComponents[componentName]) {
+        updatedComponents[componentName] = { variants: [] }
+      }
+      const existingVariants = updatedComponents[componentName].variants || []
 
-    // Update the selected theme in the themes array
-    console.log(selectedThemeIndex)
-    setThemes((prevThemes) =>
-      prevThemes.map((theme, index) =>
-        index === selectedThemeIndex ? currentTheme : theme
+      const variantIndex = existingVariants.findIndex(
+        (variant) => variant.props.variant === variantName
       )
-    )
 
-    console.log(currentTheme)
-    console.log(themes)
+      if (variantIndex > -1) {
+        existingVariants[variantIndex] = { props: { variant: variantName }, style: styles }
+      } else {
+        existingVariants.push({
+          props: { variant: variantName },
+          style: styles,
+        })
+      }
+
+      updatedComponents[componentName] = {
+        ...updatedComponents[componentName],
+        variants: existingVariants,
+      }
+      setThemes((prevThemes) =>
+        prevThemes.map((theme, index) =>
+          index === selectedThemeIndex ? {
+            ...prevTheme,
+            components: updatedComponents,
+          } : theme
+        )
+      )
+      return {
+        ...prevTheme,
+        components: updatedComponents,
+      }
+    })
 
   }
 
@@ -250,184 +259,16 @@ export default function ThemeCreator() {
 
   const getStepContent = (step) => {
     switch (step) {
-      case 2:
-        return themes.length > 0 ? (
-          <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Theme Customization
-            </Typography>
-            <Divider />
-            <br />
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  sm: '1fr 1fr',
-                  md: '1fr 1fr 1fr',
-                },
-                gap: 2,
-              }}>
-              <ColorPicker
-                label="Primary Main"
-                color={currentTheme.palette.primary.main}
-                onChange={(color) => handleColorChange("primary", "main", color)} />
-              <ColorPicker
-                label="Primary Light"
-                color={currentTheme.palette.primary.light}
-                onChange={(color) => handleColorChange("primary", "light", color)} />
-              <ColorPicker
-                label="Primary Dark"
-                color={currentTheme.palette.primary.dark}
-                onChange={(color) => handleColorChange("primary", "dark", color)} />
-              <ColorPicker
-                label="Primary Contrast Text"
-                color={currentTheme.palette.primary.contrastText}
-                onChange={(color) => handleColorChange("primary", "contrastText", color)} />
-
-              <ColorPicker
-                label="Secondary Main"
-                color={currentTheme.palette.secondary.main}
-                onChange={(color) => handleColorChange("secondary", "main", color)} />
-              <ColorPicker
-                label="Secondary Light"
-                color={currentTheme.palette.secondary.light}
-                onChange={(color) => handleColorChange("secondary", "light", color)} />
-              <ColorPicker
-                label="Secondary Dark"
-                color={currentTheme.palette.secondary.dark}
-                onChange={(color) => handleColorChange("secondary", "dark", color)} />
-              <ColorPicker
-                label="Secondary Contrast Text"
-                color={currentTheme.palette.secondary.contrastText}
-                onChange={(color) => handleColorChange("secondary", "contrastText", color)} />
-
-              <ColorPicker
-                label="Error Main"
-                color={currentTheme.palette.error.main}
-                onChange={(color) => handleColorChange("error", "main", color)} />
-              <ColorPicker
-                label="Error Light"
-                color={currentTheme.palette.error.light}
-                onChange={(color) => handleColorChange("error", "light", color)} />
-              <ColorPicker
-                label="Error Dark"
-                color={currentTheme.palette.error.dark}
-                onChange={(color) => handleColorChange("error", "dark", color)} />
-              <ColorPicker
-                label="Error Contrast Text"
-                color={currentTheme.palette.error.contrastText}
-                onChange={(color) => handleColorChange("error", "contrastText", color)} />
-
-              <ColorPicker
-                label="Warning Main"
-                color={currentTheme.palette.warning.main}
-                onChange={(color) => handleColorChange("warning", "main", color)} />
-              <ColorPicker
-                label="Warning Light"
-                color={currentTheme.palette.warning.light}
-                onChange={(color) => handleColorChange("warning", "light", color)} />
-              <ColorPicker
-                label="Warning Dark"
-                color={currentTheme.palette.warning.dark}
-                onChange={(color) => handleColorChange("warning", "dark", color)} />
-              <ColorPicker
-                label="Warning Contrast Text"
-                color={currentTheme.palette.warning.contrastText}
-                onChange={(color) => handleColorChange("warning", "contrastText", color)} />
-
-              <ColorPicker
-                label="Info Main"
-                color={currentTheme.palette.info.main}
-                onChange={(color) => handleColorChange("info", "main", color)} />
-              <ColorPicker
-                label="Info Light"
-                color={currentTheme.palette.info.light}
-                onChange={(color) => handleColorChange("info", "light", color)} />
-              <ColorPicker
-                label="Info Dark"
-                color={currentTheme.palette.info.dark}
-                onChange={(color) => handleColorChange("info", "dark", color)} />
-              <ColorPicker
-                label="Info Contrast Text"
-                color={currentTheme.palette.info.contrastText}
-                onChange={(color) => handleColorChange("info", "contrastText", color)} />
-
-              <ColorPicker
-                label="Success Main"
-                color={currentTheme.palette.success.main}
-                onChange={(color) => handleColorChange("success", "main", color)} />
-              <ColorPicker
-                label="Success Light"
-                color={currentTheme.palette.success.light}
-                onChange={(color) => handleColorChange("success", "light", color)} />
-              <ColorPicker
-                label="Success Dark"
-                color={currentTheme.palette.success.dark}
-                onChange={(color) => handleColorChange("success", "dark", color)} />
-              <ColorPicker
-                label="Success Contrast Text"
-                color={currentTheme.palette.success.contrastText}
-                onChange={(color) => handleColorChange("success", "contrastText", color)} />
-
-              <ColorPicker
-                label="Background Default"
-                color={currentTheme.palette.background.default}
-                onChange={(color) => handleColorChange("background", "default", color)} />
-              <ColorPicker
-                label="Background Paper"
-                color={currentTheme.palette.background.paper}
-                onChange={(color) => handleColorChange("background", "paper", color)} />
-
-              <ColorPicker
-                label="Text Primary"
-                color={currentTheme.palette.text.primary}
-                onChange={(color) => handleColorChange("text", "primary", color)} />
-              <ColorPicker
-                label="Text Secondary"
-                color={currentTheme.palette.text.secondary}
-                onChange={(color) => handleColorChange("text", "secondary", color)} />
-              <ColorPicker
-                label="Text Disabled"
-                color={currentTheme.palette.text.disabled}
-                onChange={(color) => handleColorChange("text", "disabled", color)} />
-
-              <ColorPicker
-                label="Action Active"
-                color={currentTheme.palette.action.active}
-                onChange={(color) => handleColorChange("action", "active", color)} />
-              <ColorPicker
-                label="Action Hover"
-                color={currentTheme.palette.action.hover}
-                onChange={(color) => handleColorChange("action", "hover", color)} />
-              <ColorPicker
-                label="Action Selected"
-                color={currentTheme.palette.action.selected}
-                onChange={(color) => handleColorChange("action", "selected", color)} />
-              <ColorPicker
-                label="Action Disabled"
-                color={currentTheme.palette.action.disabled}
-                onChange={(color) => handleColorChange("action", "disabled", color)} />
-              <ColorPicker
-                label="Action Disabled Background"
-                color={currentTheme.palette.action.disabledBackground}
-                onChange={(color) => handleColorChange("action", "disabledBackground", color)} />
-              <ColorPicker
-                label="Action Focus"
-                color={currentTheme.palette.action.focus}
-                onChange={(color) => handleColorChange("action", "focus", color)} />
-
-              <ColorPicker
-                label="Divider"
-                color={currentTheme.palette.divider}
-                onChange={(color) => handleColorChange("divider", "", color)} />
-            </Box>
-          </Paper>
-        ) : (
-          <Typography>Please add a theme first.</Typography>
-        )
-      case 3:
-        return themes.length > 0 ? <ComponentCustomizer onCustomize={handleComponentCustomization} /> : <Typography>Please add a theme first.</Typography>
+      case 2: return (
+        <ColorCustomizer
+          isThemesAvailable={themes.length > 0}
+          currentTheme={currentTheme}
+          handleColorChange={handleColorChange} />
+      )
+      case 3: return themes.length > 0 ?
+        <ComponentCustomizer
+          onCustomize={handleComponentCustomization} />
+        : <Typography>Please add a theme first.</Typography>
       default:
         return "Unknown step"
     }
@@ -464,44 +305,13 @@ export default function ThemeCreator() {
         oldThemeName={oldThemeName}
         themes={themes} />
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          mb: 2,
-          border: '1px solid #2196f3',
-          borderRadius: 1,
-          padding: 1,
-        }}>
-
-        <Button
-          variant="outlined"
-          disabled={activeStep === 2}
-          onClick={handleBack}
-          sx={{ p: 1 }}
-        >
-          Edit Color pallete
-        </Button>
-        <Box sx={{ flex: '1 1 auto' }} />
-
-        {activeStep !== 3 &&
-          <Button
-            variant="outlined"
-            onClick={handleNext}>
-            Edit components
-          </Button>
-        }
-
-        {activeStep === 3 &&
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={generateThemeJson}
-            disabled={themes.length === 0}
-          >
-            Generate Themes JSON
-          </Button>}
-      </Box>
+      <ControlPanel
+        activeStep={activeStep}
+        handleBack={handleBack}
+        handleNext={handleNext}
+        generateThemeJson={generateThemeJson}
+        themes={themes}
+      />
 
       <Box
         sx={{
@@ -509,7 +319,7 @@ export default function ThemeCreator() {
           minHeight: 800,
           gridTemplateColumns: {
             xs: '1fr',
-            md: '1fr 2fr 0.6fr',
+            md: '0.6fr 2fr 0.6fr',
           },
           gap: 3,
         }}>

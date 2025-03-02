@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { TextField, Button, Paper } from "@mui/material"
+
+const componentsArray = require("../../data/components.json")
 
 export default function ComponentCustomizer({ onCustomize }) {
   const [componentName, setComponentName] = useState("")
@@ -23,12 +25,23 @@ export default function ComponentCustomizer({ onCustomize }) {
   return (
     <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
       <TextField
+        select
         label="Component Name"
         value={componentName}
         onChange={(e) => setComponentName(e.target.value)}
         fullWidth
         margin="normal"
-      />
+        SelectProps={{
+          native: true,
+        }}
+      >
+        <option aria-label="None" value="" />
+        {componentsArray.map((component) => (
+          <option key={component} value={component}>
+            {component}
+          </option>
+        ))}
+      </TextField>
       <TextField
         label="Variant Name"
         value={variantName}
@@ -45,7 +58,12 @@ export default function ComponentCustomizer({ onCustomize }) {
         rows={4}
         margin="normal"
       />
-      <Button variant="contained" color="secondary" onClick={handleCustomize} sx={{ marginTop: 2 }}>
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={handleCustomize}
+        sx={{ marginTop: 2 }}
+      >
         Add Component Variant
       </Button>
     </Paper>
