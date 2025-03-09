@@ -109,26 +109,33 @@ export default function ThemeCreator() {
 
 
   const handleColorChange = (colorType, colorKey, color) => {
-    setCurrentTheme((prevTheme) => ({
-      ...prevTheme,
-      palette: {
-        ...prevTheme.palette,
-        [colorType]: {
-          ...prevTheme.palette[colorType],
-          [colorKey]: color,
+    console.log(colorType, colorKey, color)
+    // Update the current theme immediately
+    setCurrentTheme((prevTheme) => {
+      const updatedTheme = {
+        ...prevTheme,
+        palette: {
+          ...prevTheme.palette,
+          ...(colorType === "divider"
+            ? { [colorType]: color }
+            : {
+              [colorType]: {
+                ...prevTheme.palette[colorType],
+                [colorKey]: color,
+              },
+            }),
         },
-      },
-    }))
-
-    // Update the selected theme in the themes array
-    setThemes((prevThemes) =>
-      prevThemes.map((theme, index) =>
-        index === selectedThemeIndex ? currentTheme : theme
+      }
+      // Update the themes array with the updated theme
+      setThemes((prevThemes) =>
+        prevThemes.map((theme, index) =>
+          index === selectedThemeIndex ? updatedTheme : theme
+        )
       )
-    )
+      return updatedTheme
+    })
   }
 
-  // TODO - fix - update the array properly
   const handleComponentCustomization = (componentName, variantName, styles) => {
     setCurrentTheme((prevTheme) => {
       const updatedComponents = { ...prevTheme.components }
