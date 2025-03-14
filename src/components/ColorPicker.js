@@ -4,7 +4,16 @@ import { Box, Stack, Typography } from "@mui/material"
 
 export default function ColorPicker({ label, color, onChange }) {
   return (
-    <Stack sx={{ display: "flex", alignItems: "center", marginBottom: 2, justifyContent: 'center' }}>
+    <Stack
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        marginBottom: 2,
+        justifyContent: 'center'
+      }}>
+
+      <Typography fontWeight='bold' color={color} >{color}</Typography>
+
       <input
         type="color"
         value={color}
@@ -17,8 +26,7 @@ export default function ColorPicker({ label, color, onChange }) {
           borderRadius: 5
         }}
       />
-      <Typography sx={{ marginRight: 2 }}>{label}</Typography>
-      {/* <Typography sx={{ marginLeft: 1}}>{color}</Typography> */}
+      <Typography fontWeight='bold'>{label}</Typography>
     </Stack>
   )
 }

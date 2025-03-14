@@ -45,7 +45,7 @@ export function ThemePanel(props) {
                     setOpenNewThemeModal={setOpenNewThemeModal}
                 />
             ) : (
-                <Typography>No themes added yet.</Typography>
+                <Typography>No themes added yet. Click the Add button to create your first theme!</Typography>
             )}
         </Paper>
     )
