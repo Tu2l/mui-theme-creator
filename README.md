@@ -1,7 +1,7 @@
-# Zoltraak Theme Creator
+# MUI Theme Creator
 This project allows users to create custom MUI themes. Users can download the `mui-themes.json` file and load it into their React/Next.js application to apply the theme.
 
-## Demo - https://tu2l.github.io/zoltraak-theme-creator/
+## Demo - https://tu2l.github.io/mui-theme-creator/
 
 ## Local Setup
 
