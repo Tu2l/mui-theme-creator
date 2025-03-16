@@ -7,12 +7,12 @@ This project allows users to create custom MUI themes. Users can download the `m
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/tu2l/zoltraak-theme-creator.git
+    git clone https://github.com/tu2l/mui-theme-creator.git
     ```
 2.  Navigate to the project directory:
 
     ```bash
-    cd zoltraak-theme-creator
+    cd mui-theme-creator
     ```
 3.  Install the dependencies:
 

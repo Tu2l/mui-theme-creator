@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Zoltraak Theme Creator",
+  title: "MUI Theme Creator",
   description: "Create mui based themes with ease",
 };
 
