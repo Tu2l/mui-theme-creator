@@ -1,0 +1,59 @@
+{
+  "Button": [
+    { "name": "color", "type": "select", "options": ["inherit", "primary", "secondary", "success", "error", "info", "warning"] },
+    { "name": "variant", "type": "select", "options": ["contained", "outlined", "text"] },
+    { "name": "size", "type": "select", "options": ["small", "medium", "large"] },
+    { "name": "fullWidth", "type": "boolean" },
+    { "name": "disableElevation", "type": "boolean" },
+    { "name": "disabled", "type": "boolean" },
+    { "name": "backgroundColor", "type": "color" },
+    { "name": "borderRadius", "type": "string" },
+    { "name": "boxShadow", "type": "string" },
+    { "name": "fontWeight", "type": "string" },
+    { "name": "padding", "type": "string" }
+  ],
+  "TextField": [
+    { "name": "color", "type": "select", "options": ["primary", "secondary", "error", "info", "success", "warning"] },
+    { "name": "variant", "type": "select", "options": ["outlined", "filled", "standard"] },
+    { "name": "size", "type": "select", "options": ["small", "medium"] },
+    { "name": "fullWidth", "type": "boolean" },
+    { "name": "disabled", "type": "boolean" },
+    { "name": "backgroundColor", "type": "color" },
+    { "name": "borderRadius", "type": "string" },
+    { "name": "boxShadow", "type": "string" },
+    { "name": "fontWeight", "type": "string" },
+    { "name": "padding", "type": "string" }
+  ],
+  "Paper": [
+    { "name": "elevation", "type": "number", "min": 0, "max": 24 },
+    { "name": "variant", "type": "select", "options": ["elevation", "outlined"] },
+    { "name": "square", "type": "boolean" },
+    { "name": "backgroundColor", "type": "color" },
+    { "name": "borderRadius", "type": "string" },
+    { "name": "boxShadow", "type": "string" },
+    { "name": "fontWeight", "type": "string" },
+    { "name": "padding", "type": "string" }
+  ],
+  "Box": [
+    { "name": "backgroundColor", "type": "color" },
+    { "name": "borderRadius", "type": "string" },
+    { "name": "boxShadow", "type": "string" },
+    { "name": "fontWeight", "type": "string" },
+    { "name": "padding", "type": "string" },
+    { "name": "margin", "type": "string" },
+    { "name": "width", "type": "string" },
+    { "name": "height", "type": "string" }
+  ],
+  "AppBar": [
+    { "name": "color", "type": "select", "options": ["default", "inherit", "primary", "secondary", "transparent", "error", "info", "success", "warning"] },
+    { "name": "position", "type": "select", "options": ["absolute", "fixed", "relative", "static", "sticky"] },
+    { "name": "enableColorOnDark", "type": "boolean" },
+    { "name": "elevation", "type": "number", "min": 0, "max": 24 },
+    { "name": "variant", "type": "select", "options": ["elevation", "outlined"] },
+    { "name": "backgroundColor", "type": "color" },
+    { "name": "borderRadius", "type": "string" },
+    { "name": "boxShadow", "type": "string" },
+    { "name": "fontWeight", "type": "string" },
+    { "name": "padding", "type": "string" }
+  ]
+}

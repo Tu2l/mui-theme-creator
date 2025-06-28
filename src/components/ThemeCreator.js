@@ -106,6 +106,7 @@ export default function ThemeCreator() {
   const [activeStep, setActiveStep] = useState(2)
   const [expandedComponent, setExpandedComponent] = useState(null)
   const [openNewThemeModal, setOpenNewThemeModal] = useState(false)
+  const [editComponent, setEditComponent] = useState(null) // { componentName, variant, index }
 
 
   const handleColorChange = (colorType, colorKey, color) => {
@@ -136,6 +137,11 @@ export default function ThemeCreator() {
     })
   }
 
+  const handleEditVariant = (componentName, variant, index) => {
+    setEditComponent({ componentName, variant, index })
+    setActiveStep(3) // Go to the customizer step if not already there
+  }
+
   const handleComponentCustomization = (componentName, variantName, styles) => {
     setCurrentTheme((prevTheme) => {
       const updatedComponents = { ...prevTheme.components }
@@ -144,9 +150,9 @@ export default function ThemeCreator() {
       }
       const existingVariants = updatedComponents[componentName].variants || []
 
-      const variantIndex = existingVariants.findIndex(
-        (variant) => variant.props.variant === variantName
-      )
+      const variantIndex = editComponent && editComponent.componentName === componentName && editComponent.variant?.props?.variant === variantName
+        ? editComponent.index
+        : existingVariants.findIndex((variant) => variant.props.variant === variantName)
 
       if (variantIndex > -1) {
         existingVariants[variantIndex] = { props: { variant: variantName }, style: styles }
@@ -174,7 +180,7 @@ export default function ThemeCreator() {
         components: updatedComponents,
       }
     })
-
+    setEditComponent(null) // Reset edit state after update
   }
 
   const handleDeleteTheme = (index) => {
@@ -274,7 +280,9 @@ export default function ThemeCreator() {
       )
       case 3: return themes.length > 0 ?
         <ComponentCustomizer
-          onCustomize={handleComponentCustomization} />
+          onCustomize={handleComponentCustomization}
+          editComponent={editComponent}
+        />
         : <Typography>Please add a theme first.</Typography>
       default:
         return "Unknown step"
@@ -296,8 +304,64 @@ export default function ThemeCreator() {
     setThemeType("light")
   }
 
+  // Delete a component from the theme
+  const handleDeleteComponent = (componentName) => {
+    if (window.confirm(`Are you sure you want to delete the component '${componentName}' and all its variants?`)) {
+      setCurrentTheme((prevTheme) => {
+        const updatedComponents = { ...prevTheme.components }
+        delete updatedComponents[componentName]
+        return { ...prevTheme, components: updatedComponents }
+      })
+      setThemes((prevThemes) =>
+        prevThemes.map((theme, index) =>
+          index === selectedThemeIndex
+            ? { ...theme, components: { ...theme.components, [componentName]: undefined } }
+            : theme
+        ).map(theme => {
+          // Remove undefined keys
+          const cleaned = { ...theme.components }
+          Object.keys(cleaned).forEach(key => cleaned[key] === undefined && delete cleaned[key])
+          return { ...theme, components: cleaned }
+        })
+      )
+    }
+  }
+
+  // Delete a variant from a component
+  const handleDeleteVariant = (componentName, variantIndex) => {
+    if (window.confirm(`Are you sure you want to delete this variant?`)) {
+      setCurrentTheme((prevTheme) => {
+        const updatedComponents = { ...prevTheme.components }
+        if (updatedComponents[componentName]) {
+          const newVariants = [...updatedComponents[componentName].variants]
+          newVariants.splice(variantIndex, 1)
+          updatedComponents[componentName] = {
+            ...updatedComponents[componentName],
+            variants: newVariants
+          }
+        }
+        return { ...prevTheme, components: updatedComponents }
+      })
+      setThemes((prevThemes) =>
+        prevThemes.map((theme, index) => {
+          if (index !== selectedThemeIndex) return theme
+          const updatedComponents = { ...theme.components }
+          if (updatedComponents[componentName]) {
+            const newVariants = [...updatedComponents[componentName].variants]
+            newVariants.splice(variantIndex, 1)
+            updatedComponents[componentName] = {
+              ...updatedComponents[componentName],
+              variants: newVariants
+            }
+          }
+          return { ...theme, components: updatedComponents }
+        })
+      )
+    }
+  }
+
   return (
-    <Box sx={{ flexGrow: 1, padding: 3 }}>
+    <Box sx={{ flexGrow: 1, height: '100vh', width: '100vw', p: 0, m: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <NewThemeModal
         openNewThemeModal={openNewThemeModal}
         handleCloseNewThemeModal={handleCloseNewThemeModal}
@@ -323,12 +387,17 @@ export default function ThemeCreator() {
       <Box
         sx={{
           display: 'grid',
-          minHeight: 800,
+          flex: 1,
+          minHeight: 0,
+          minWidth: 0,
+          height: '100%',
+          width: '100%',
           gridTemplateColumns: {
             xs: '1fr',
             md: '0.6fr 2fr 0.6fr',
           },
           gap: 3,
+          overflow: 'hidden',
         }}>
 
         <ThemePanel
@@ -342,12 +411,17 @@ export default function ThemeCreator() {
           setOpenNewThemeModal={setOpenNewThemeModal}
           handleOpenNewThemeModal={handleOpenNewThemeModal} />
 
-        {getStepContent(activeStep)}
+        <Box sx={{ minHeight: 0, minWidth: 0, height: '100%', width: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {getStepContent(activeStep)}
+        </Box>
 
         <ComponentPanel
           currentTheme={currentTheme}
           expandedComponent={expandedComponent}
           handleComponentClick={handleComponentClick}
+          handleEditVariant={handleEditVariant}
+          handleDeleteComponent={handleDeleteComponent}
+          handleDeleteVariant={handleDeleteVariant}
         />
       </Box>
     </Box>

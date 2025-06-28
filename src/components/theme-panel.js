@@ -30,7 +30,7 @@ export function ThemePanel(props) {
         setThemeType,
         setOpenNewThemeModal, handleOpenNewThemeModal } = props
     return (
-        <Paper elevation={3} sx={{ padding: 2 }}>
+        <Paper elevation={3} sx={{ padding: 2, height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
             <ThemePanelHeader handleOpenNewThemeModal={handleOpenNewThemeModal} />
 
             {themes.length > 0 ? (

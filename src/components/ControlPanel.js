@@ -24,15 +24,18 @@ export default function ControlPanel(props) {
         >
         {"<"} Edit Color pallete
         </Button>
-        <Box sx={{ flex: '1 1 auto' }} />
-  
+        <Box sx={{ flex: '1 1 auto', display: { xs: 'none', sm: 'flex' }, alignItems: 'center', justifyContent: 'center' }}>
+          <Box sx={{ textAlign: 'center', width: '100%' }}>
+            <span style={{ fontWeight: 600, fontSize: 20 }}>MUI Theme Creator</span>
+          </Box>
+        </Box>
+        {/* Right side buttons */}
         {activeStep !== 3 &&
           <Button
             variant="outlined"
             onClick={handleNext}>
             Edit components {">"}
           </Button>}
-  
         {activeStep === 3 &&
           <Button
             variant="contained"
